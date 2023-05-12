@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class ReadBarcodeFromFile extends AsyncTask<Void, Void, String> {
+public class ReadBarcodeFromFile extends AsyncTask<Void, Void, ArrayList<String>> {
 
     private static final int NUMBER_OF_ATTEMPTS = 4;
     private static final double PORCENTAGEM_ESCALA = 0.05;
@@ -58,33 +58,34 @@ public class ReadBarcodeFromFile extends AsyncTask<Void, Void, String> {
     }
 
     @Override
-    protected String doInBackground(Void... voids) {
+    protected ArrayList<String> doInBackground(Void... voids) {
+        ArrayList<String> arr = new ArrayList<String>( );
         if (filePath != null) {
             int tryNumber = 1;
             while (tryNumber <= NUMBER_OF_ATTEMPTS && !outOfMemoryError) {
-                Bitmap bitmap;
-                if (entryType == EntryType.PDF) {
-                    bitmap = generateImageFromPdf(filePath, 0, tryNumber);
-                } else {
-                    bitmap = BitmapFactory.decodeFile(filePath.getPath());
-                    bitmap = resizeImage(bitmap, tryNumber);
-                }
+               Bitmap bitmap;
+               if (entryType == EntryType.PDF) {
+                   bitmap = generateImageFromPdf(filePath, 0, tryNumber);
+               } else {
+                   bitmap = BitmapFactory.decodeFile(filePath.getPath());
+                   bitmap = resizeImage(bitmap, tryNumber);
+               }
                 if (bitmap != null) {
                     String code = scanImage(bitmap, new MultiFormatReader());
                     if (code != null && !code.isEmpty()) {
-                        return code;
+                        arr.add(code);
                     }
                 }
                 tryNumber++;
             }
         }
-        return "";
+        return arr;
     }
 
     @Override
-    protected void onPostExecute(String result) {
+    protected void onPostExecute(ArrayList<String> result) {
         if (!outOfMemoryError) {
-            if (result != null && !result.isEmpty()) {
+            if (!result.isEmpty()) {
                 listener.onBarcodeFound(result);
             } else {
                 listener.onBarcodeNotFound();

@@ -28,14 +28,16 @@ public class SwiftBarcodeFinderPlugin: NSObject, FlutterPlugin {
                             return
                         }
                         let barcodesToFilter = BarcodeFormatType.createBarcodeFormatTypeFromStrings(strings: barcodeFormats!)
+                        var resultArr: [String] = []
                         for uiImage in pdfImages ?? [UIImage](){
-                            if let barcode =  scanner.tryFindBarcodeFrom(uiImage: uiImage, barcodesToFilter: barcodesToFilter){
-                                result(barcode)
-                                return;
-                            }
+                            resultArr.append(contentsOf: scanner.tryFindBarcodeFrom(uiImage: uiImage, barcodesToFilter: barcodesToFilter))
                         }
                         
-                        result(FlutterError(code: "not-found" , message: "No barcode found on the file", details: nil))
+                        if resultArr.count == 0 {
+                            result(FlutterError(code: "not-found" , message: "No barcode found on the file", details: nil))
+                        } else {
+                            result(resultArr)
+                        }
                         return
                     }
                 }
@@ -61,12 +63,14 @@ public class SwiftBarcodeFinderPlugin: NSObject, FlutterPlugin {
                     result(FlutterError(code: "not-found" , message: "No barcode found on the file", details: nil))
                     return
                 }
+                var resultArr: [String] = []
                 let barcodesToFilter = BarcodeFormatType.createBarcodeFormatTypeFromStrings(strings: barcodeFormats!)
-                if let barcode =  scanner.tryFindBarcodeFrom(uiImage: uiImage!, barcodesToFilter: barcodesToFilter){
-                    result(barcode)
-                    return;
+                    resultArr.append(contentsOf: scanner.tryFindBarcodeFrom(uiImage: uiImage!, barcodesToFilter: barcodesToFilter))
+                if resultArr.count == 0 {
+                    result(FlutterError(code: "not-found" , message: "No barcode found on the file", details: nil))
+                } else {
+                    result(resultArr)
                 }
-                result(FlutterError(code: "not-found" , message: "No barcode found on the file", details: nil))
                 return
             } else {
                 result(FlutterError(code: "no-arguments", message: "No arguments provided", details: nil))
@@ -74,6 +78,4 @@ public class SwiftBarcodeFinderPlugin: NSObject, FlutterPlugin {
             }
         }
     }
-    
-    
 }

@@ -11,7 +11,7 @@ class BarcodeScanner {
     
     var image: UIImage?
     var barcodesToFilter: [BarcodeFormatType]?
-    func tryFindBarcodeFrom(uiImage: UIImage, barcodesToFilter: [BarcodeFormatType] = [BarcodeFormatType.any]) -> String?{
+    func tryFindBarcodeFrom(uiImage: UIImage, barcodesToFilter: [BarcodeFormatType] = [BarcodeFormatType.any]) -> [String] {
         self.image = uiImage
         self.barcodesToFilter = barcodesToFilter
         let rotationAttemptResult = tryRotateImage(uiImage)
@@ -19,20 +19,17 @@ class BarcodeScanner {
         
     }
     
-    private func tryRotateImage(_ uiImage: UIImage) -> String?{
+    private func tryRotateImage(_ uiImage: UIImage) -> [String] {
+        var array: [String] = []
         let attemptList = createAttemptList()
         for attempFunction in attemptList{
-            if let barcode = attempFunction(uiImage){
-                if(!barcode.isEmpty){
-                    return barcode
-                }
-            }
+            array.append(contentsOf: attempFunction(uiImage))
         }
-        return nil;
+        return array
     }
     
-    private func createAttemptList() -> Array<((UIImage) ->String?)> {
-        var attemptTransformList = Array<((UIImage) ->String?)>()
+    private func createAttemptList() -> Array<((UIImage) ->[String])> {
+        var attemptTransformList = Array<((UIImage) ->[String])>()
         attemptTransformList.append(decodeUnmodifiedImage)
         attemptTransformList.append(decodeRotated90DegreesImage)
         attemptTransformList.append(decodeRotated90DegreesImage)
@@ -42,22 +39,21 @@ class BarcodeScanner {
         return attemptTransformList
     }
     
-    private func decodeRotated90DegreesImage(uiImage: UIImage) ->String?{
+    private func decodeRotated90DegreesImage(uiImage: UIImage) -> [String] {
         let rotated = uiImage.rotate(radians: .pi/2)
         self.image = rotated
         return getBarcodeFromImage(uiImage: uiImage, barcodesToFilter: self.barcodesToFilter!)
     }
     
-    private func decodeUnmodifiedImage(uiImage: UIImage) ->String?{
+    private func decodeUnmodifiedImage(uiImage: UIImage) -> [String] {
         return getBarcodeFromImage(uiImage: uiImage, barcodesToFilter: self.barcodesToFilter!)
         
     }
     
-    private func decodeCroppedPdf(uiImage: UIImage) ->String?{
+    private func decodeCroppedPdf(uiImage: UIImage) -> [String] {
         let cropped = uiImage.cropHalf()
         return getBarcodeFromImage(uiImage: cropped, barcodesToFilter: self.barcodesToFilter!)
         
     }
-    
 }
 

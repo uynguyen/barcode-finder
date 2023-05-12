@@ -40,8 +40,8 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         Uri uri = Uri.fromFile(file);
         ReadBarcodeFromFile readBarcodeFromFile = new ReadBarcodeFromFile(new OnBarcodeReceivedListener() {
             @Override
-            public void onBarcodeFound(String code) {
-                result.success(code);
+            public void onBarcodeFound(ArrayList<String> codes) {
+                result.success(codes);
             }
 
             @Override

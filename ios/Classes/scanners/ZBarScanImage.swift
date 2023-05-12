@@ -8,17 +8,20 @@
 import Foundation
 import ATBarSDK
 
-func zbarScanImage(_ image: UIImage, barcodesToFilter: [BarcodeFormatType]) -> String?{
+func zbarScanImage(_ image: UIImage, barcodesToFilter: [BarcodeFormatType]) -> [String] {
+    var array: [String] = []
     let reader = ZBarReaderController()
     reader.scanner.addSymbologiesFor(barcodesToFilter)
     guard reader.scanner.scanImage(ZBarImage(cgImage: image.cgImage!)) > 0 else{
-        return nil
+        return array
     }
-    guard let symbolFound = reader.scanner.results.symbolFound else {
-        return nil
+    for symbolFound in reader.scanner.results {
+        if let code = (symbolFound as? ZBarSymbol)?.stringFromData {
+            array.append(code)
+        }
     }
-    return symbolFound.stringFromData
     
+    return array
 }
 
 extension ZBarImageScanner{

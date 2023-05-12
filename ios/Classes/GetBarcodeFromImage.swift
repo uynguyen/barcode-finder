@@ -7,34 +7,21 @@
 
 import Foundation
 
-func getBarcodeFromImage(uiImage: UIImage, barcodesToFilter: [BarcodeFormatType] = [BarcodeFormatType.any]) -> String?{
+func getBarcodeFromImage(uiImage: UIImage, barcodesToFilter: [BarcodeFormatType] = [BarcodeFormatType.any]) -> [String] {
+    var array: [String] = []
     let scanners = [scanUsingZxing, scanUsingZBar]
     for scanner in scanners{
-        if let barcodeFound = scanner(uiImage, barcodesToFilter){
-            return barcodeFound
-        }
+        array.append(contentsOf: scanner(uiImage, barcodesToFilter))
     }
-    return nil
+    return array
 }
 
 
-private func scanUsingZxing(_ image: UIImage, barcodesToFilter: [BarcodeFormatType]) ->String?{
-    let result: String? = zxingScanImage(image, barcodesToFilter: barcodesToFilter)
-    if let barcode = result{
-        if(!barcode.isEmpty){
-            return barcode
-        }
-    }
-    return nil
+private func scanUsingZxing(_ image: UIImage, barcodesToFilter: [BarcodeFormatType]) ->[String]{
+    return zxingScanImage(image, barcodesToFilter: barcodesToFilter)
 }
 
-private func scanUsingZBar(_ image: UIImage, barcodesToFilter: [BarcodeFormatType]) ->String?{
-    let result: String? = zbarScanImage(image, barcodesToFilter: barcodesToFilter)
-    if let barcode = result{
-        if(!barcode.isEmpty){
-            return barcode
-        }
-    }
-    return nil
+private func scanUsingZBar(_ image: UIImage, barcodesToFilter: [BarcodeFormatType]) -> [String] {
+    return zbarScanImage(image, barcodesToFilter: barcodesToFilter)
 }
 
