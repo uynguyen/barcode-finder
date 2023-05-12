@@ -5,7 +5,7 @@ abstract class BarcodeFinder {
 
   /// If [formats] parameter is an empty list
   /// it will scan for all possible formats
-  static Future<String?> scanFile({
+  static Future<dynamic> scanFile({
     required String path,
     List<BarcodeFormat> formats = const [],
   }) async {
